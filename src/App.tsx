@@ -20,7 +20,7 @@ import { describeWeatherCode } from './utils/weatherCodes'
 import { displayTemp, displayWind, windUnitLabel } from './utils/units'
 import { weatherTheme } from './utils/weatherBackground'
 
-const DEFAULT_CITY = 'Madrid'
+const DEFAULT_CITY = 'Lagos, Nigeria'
 const HOURS_AHEAD = 8
 const TEMP_SUFFIX = '°'
 
