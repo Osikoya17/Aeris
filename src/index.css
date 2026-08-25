@@ -109,6 +109,15 @@ body {
   background-color: color-mix(in oklab, var(--faint) 65%, transparent);
 }
 
+/* Carousel tracks hide their scrollbar — swipe + pagination dots are the
+   affordance. Overrides the themed scrollbar above for elements that opt in. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Gentle entrance used by cards as data arrives. */
 @keyframes aeris-rise {
   from {

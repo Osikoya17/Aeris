@@ -1,4 +1,5 @@
 import ForecastDay, { type ForecastDayData } from './ForecastDay'
+import Carousel from '../ui/Carousel'
 
 interface WeeklyForecastProps {
   days: ForecastDayData[]
@@ -11,11 +12,11 @@ const WeeklyForecast = ({ days }: WeeklyForecastProps) => {
         Next 7 days
       </h2>
 
-      <div className="flex gap-2.5 overflow-x-auto pb-1 md:gap-3">
+      <Carousel ariaLabel="7-day forecast" gap="gap-2.5 md:gap-3">
         {days.map((day, i) => (
           <ForecastDay key={day.date} {...day} isToday={i === 0} />
         ))}
-      </div>
+      </Carousel>
     </section>
   )
 }

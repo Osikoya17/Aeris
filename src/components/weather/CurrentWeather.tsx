@@ -54,10 +54,10 @@ const CurrentWeather = ({
           <p className="mt-0.5 text-sm text-hero-muted">{date}</p>
 
           <div className="mt-6 flex items-start gap-1">
-            <span className="text-7xl font-bold leading-none tracking-tight text-hero-content">
+            <span className="text-6xl font-bold leading-none tracking-tight text-hero-content sm:text-7xl">
               {temperature}
             </span>
-            <span className="mt-1 text-3xl font-medium text-hero-muted">{tempSuffix}</span>
+            <span className="mt-1 text-2xl font-medium text-hero-muted sm:text-3xl">{tempSuffix}</span>
           </div>
 
           <p className="mt-3 text-base font-semibold text-hero-content">{condition}</p>

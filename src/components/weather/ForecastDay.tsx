@@ -26,7 +26,7 @@ const ForecastDay = ({
 }: ForecastDayProps) => {
   return (
     <div
-      className={`flex min-w-19 flex-1 flex-col items-center gap-3 rounded-2xl px-2 py-4 transition-colors ${
+      className={`flex min-w-19 flex-1 snap-start flex-col items-center gap-3 rounded-2xl px-2 py-4 transition-colors ${
         isToday
           ? 'bg-accent text-accent-content shadow-lg shadow-black/15'
           : 'bg-inset text-content hover:bg-panel-hover'

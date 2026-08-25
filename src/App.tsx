@@ -8,6 +8,7 @@ import HourlyForecast from './components/weather/HourlyForecast'
 import WeatherConditions from './components/weather/WeatherConditions'
 import WeeklyForecast from './components/weather/WeeklyForecast'
 import ChanceOfRain, { type RainHour } from './components/weather/ChanceOfRain'
+import HighlightsDeck from './components/weather/HighlightsDeck'
 import UnitToggle from './components/ui/UnitToggle'
 import ThemeToggle from './components/ui/ThemeToggle'
 import Loading from './components/ui/Loading'
@@ -153,16 +154,18 @@ const App = () => {
           <span className="text-lg font-semibold text-content">Aeris</span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="min-w-0 sm:flex-1">
             <SearchBar
               onSelect={fetchWeatherForLocation}
               onUseLocation={useMyLocation}
               loading={loading}
             />
           </div>
-          <UnitToggle unit={unit} onChange={setUnit} />
-          <ThemeToggle theme={theme} onChange={setTheme} />
+          <div className="flex items-center justify-end gap-2">
+            <UnitToggle unit={unit} onChange={setUnit} />
+            <ThemeToggle theme={theme} onChange={setTheme} />
+          </div>
         </div>
 
         {error && (
@@ -179,47 +182,61 @@ const App = () => {
 
         {weather && location && (
           <div
-            className={`mt-5 space-y-5 transition-opacity duration-300 ${
+            className={`mt-5 transition-opacity duration-300 ${
               loading ? 'opacity-50' : 'opacity-100'
             }`}
           >
-            {/* Hero current-day card beside the horizontal week strip + rain chart,
-                echoing the design's prominent "today" panel and day row. */}
-            <div className="grid items-start gap-5 lg:grid-cols-[minmax(320px,380px)_1fr]">
-              <CurrentWeather
-                city={location.name}
-                region={describeLocation(location)}
-                date={formatLongDate(weather.current.time)}
-                temperature={displayTemp(weather.current.temperature_2m, unit)}
-                feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
-                tempSuffix={TEMP_SUFFIX}
-                code={weather.current.weather_code}
-                isDay={weather.current.is_day === 1}
-                condition={describeWeatherCode(weather.current.weather_code)}
-                rainChance={rainChance}
-                glow={pageTheme?.glow ?? 'transparent'}
-              />
-
-              <div className="space-y-5">
-                <WeeklyForecast days={days} />
-                <ChanceOfRain hours={rainHours} />
-              </div>
-            </div>
-
-            {/* Full-width temperature trend, then the detailed conditions grid. */}
-            <HourlyForecast hours={hours} />
-
-            <WeatherConditions
+            {/* Mobile-only quick highlights; from md up these live in the hero
+                and the Air conditions grid below. */}
+            <HighlightsDeck
               feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
+              rainChance={rainChance}
               wind={displayWind(weather.current.wind_speed_10m, unit)}
-              windDirection={weather.current.wind_direction_10m}
               humidity={weather.current.relative_humidity_2m}
               uvIndex={weather.daily.uv_index_max[0]}
-              sunrise={weather.daily.sunrise[0]}
-              sunset={weather.daily.sunset[0]}
               tempSuffix={TEMP_SUFFIX}
               windLabel={windUnitLabel(unit)}
             />
+
+            <div className="space-y-4 md:space-y-5">
+              {/* Hero current-day card beside the horizontal week strip + rain chart,
+                  echoing the design's prominent "today" panel and day row. */}
+              <div className="grid items-start gap-4 md:gap-5 lg:grid-cols-[minmax(320px,380px)_1fr]">
+                <CurrentWeather
+                  city={location.name}
+                  region={describeLocation(location)}
+                  date={formatLongDate(weather.current.time)}
+                  temperature={displayTemp(weather.current.temperature_2m, unit)}
+                  feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
+                  tempSuffix={TEMP_SUFFIX}
+                  code={weather.current.weather_code}
+                  isDay={weather.current.is_day === 1}
+                  condition={describeWeatherCode(weather.current.weather_code)}
+                  rainChance={rainChance}
+                  glow={pageTheme?.glow ?? 'transparent'}
+                />
+
+                <div className="space-y-4 md:space-y-5">
+                  <WeeklyForecast days={days} />
+                  <ChanceOfRain hours={rainHours} />
+                </div>
+              </div>
+
+              {/* Full-width temperature trend, then the detailed conditions grid. */}
+              <HourlyForecast hours={hours} />
+
+              <WeatherConditions
+                feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
+                wind={displayWind(weather.current.wind_speed_10m, unit)}
+                windDirection={weather.current.wind_direction_10m}
+                humidity={weather.current.relative_humidity_2m}
+                uvIndex={weather.daily.uv_index_max[0]}
+                sunrise={weather.daily.sunrise[0]}
+                sunset={weather.daily.sunset[0]}
+                tempSuffix={TEMP_SUFFIX}
+                windLabel={windUnitLabel(unit)}
+              />
+            </div>
           </div>
         )}
       </main>

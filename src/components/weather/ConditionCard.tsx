@@ -7,11 +7,15 @@ export interface ConditionCardProps {
   value: string
   /** Optional secondary content below the value — a meter, bar, or note. */
   sub?: ReactNode
+  /** Extra classes for the card root (e.g. carousel snap/width utilities). */
+  className?: string
 }
 
-const ConditionCard = ({ icon: Icon, label, value, sub }: ConditionCardProps) => {
+const ConditionCard = ({ icon: Icon, label, value, sub, className = '' }: ConditionCardProps) => {
   return (
-    <div className="flex flex-col rounded-2xl border border-line bg-inset p-4 transition-colors hover:bg-panel-hover">
+    <div
+      className={`flex flex-col rounded-2xl border border-line bg-inset p-4 transition-colors hover:bg-panel-hover ${className}`}
+    >
       <div className="flex items-center gap-2 text-muted">
         <Icon size={15} />
         <span className="text-[11px] font-medium uppercase tracking-wide">{label}</span>

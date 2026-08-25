@@ -33,7 +33,7 @@ const HourlyForecastCard = ({
       onFocus={onActivate}
       onMouseLeave={onClear}
       onBlur={onClear}
-      className={`flex min-w-18 flex-1 flex-col items-center gap-2.5 rounded-2xl px-2 py-3 transition-colors ${
+      className={`flex min-w-18 flex-1 snap-start flex-col items-center gap-2.5 rounded-2xl px-2 py-3 transition-colors ${
         active ? 'bg-panel-hover' : 'hover:bg-panel-hover'
       }`}
     >

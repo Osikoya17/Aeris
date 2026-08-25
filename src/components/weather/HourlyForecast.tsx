@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import HourlyForecastCard, { type HourData } from './HourlyForecastCard'
 import TemperatureChart, { type ChartPoint } from './TemperatureChart'
+import Carousel from '../ui/Carousel'
 
 interface HourlyForecastProps {
   hours: HourData[]
@@ -24,16 +25,18 @@ const HourlyForecast = ({ hours }: HourlyForecastProps) => {
         onActiveIndexChange={setActive}
       />
 
-      <div className="mt-3 flex gap-1 overflow-x-auto">
-        {hours.map((hour, i) => (
-          <HourlyForecastCard
-            key={hour.iso}
-            {...hour}
-            active={i === active}
-            onActivate={() => setActive(i)}
-            onClear={() => setActive(null)}
-          />
-        ))}
+      <div className="mt-3">
+        <Carousel ariaLabel="Hourly forecast" gap="gap-1">
+          {hours.map((hour, i) => (
+            <HourlyForecastCard
+              key={hour.iso}
+              {...hour}
+              active={i === active}
+              onActivate={() => setActive(i)}
+              onClear={() => setActive(null)}
+            />
+          ))}
+        </Carousel>
       </div>
     </section>
   )
