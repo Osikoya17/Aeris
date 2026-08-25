@@ -104,7 +104,7 @@ const SearchBar = ({ onSelect, onUseLocation, loading = false }: SearchBarProps)
       <div className="relative flex items-center">
         <Search
           size={18}
-          className="pointer-events-none absolute left-4 text-slate-400"
+          className="pointer-events-none absolute left-4 text-faint"
         />
         <input
           type="text"
@@ -117,12 +117,12 @@ const SearchBar = ({ onSelect, onUseLocation, loading = false }: SearchBarProps)
           aria-expanded={open}
           aria-controls="aeris-search-results"
           aria-autocomplete="list"
-          className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 pl-12 pr-14 text-[15px] text-white placeholder:text-slate-500 backdrop-blur-md transition-colors focus:border-sky-400/60 focus:bg-white/8 focus:outline-none"
+          className="h-12 w-full rounded-2xl border border-line bg-panel pl-12 pr-14 text-[15px] text-content placeholder:text-faint backdrop-blur-md transition-colors focus:border-accent focus:bg-panel-hover focus:outline-none"
         />
 
         <div className="absolute right-2 flex items-center">
           {searching || loading ? (
-            <span className="flex h-9 w-9 items-center justify-center text-slate-400">
+            <span className="flex h-9 w-9 items-center justify-center text-faint">
               <LoaderCircle size={18} className="animate-spin" />
             </span>
           ) : onUseLocation ? (
@@ -131,7 +131,7 @@ const SearchBar = ({ onSelect, onUseLocation, loading = false }: SearchBarProps)
               onClick={onUseLocation}
               title="Use my location"
               aria-label="Use my location"
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/10 hover:text-sky-300"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-faint transition-colors hover:bg-panel-hover hover:text-accent"
             >
               <LocateFixed size={18} />
             </button>
@@ -143,7 +143,7 @@ const SearchBar = ({ onSelect, onUseLocation, loading = false }: SearchBarProps)
         <ul
           id="aeris-search-results"
           role="listbox"
-          className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0f1a2c]/95 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl"
+          className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-line bg-popover p-1.5 shadow-2xl shadow-black/30 backdrop-blur-xl"
         >
           {results.map((place, i) => (
             <li key={place.id} role="option" aria-selected={i === highlight}>
@@ -154,16 +154,16 @@ const SearchBar = ({ onSelect, onUseLocation, loading = false }: SearchBarProps)
                 onClick={() => choose(place)}
                 onMouseEnter={() => setHighlight(i)}
                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
-                  i === highlight ? 'bg-white/10' : 'hover:bg-white/5'
+                  i === highlight ? 'bg-panel-hover' : 'hover:bg-panel-hover'
                 }`}
               >
-                <MapPin size={16} className="shrink-0 text-sky-300" />
+                <MapPin size={16} className="shrink-0 text-accent" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-white">
+                  <span className="block truncate text-sm font-medium text-content">
                     {place.name}
                   </span>
                   {describe(place) && (
-                    <span className="block truncate text-xs text-slate-400">
+                    <span className="block truncate text-xs text-muted">
                       {describe(place)}
                     </span>
                   )}

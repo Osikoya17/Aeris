@@ -11,13 +11,13 @@ export interface ConditionCardProps {
 
 const ConditionCard = ({ icon: Icon, label, value, sub }: ConditionCardProps) => {
   return (
-    <div className="flex flex-col rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/8">
-      <div className="flex items-center gap-2 text-slate-400">
+    <div className="flex flex-col rounded-2xl border border-line bg-inset p-4 transition-colors hover:bg-panel-hover">
+      <div className="flex items-center gap-2 text-muted">
         <Icon size={15} />
         <span className="text-[11px] font-medium uppercase tracking-wide">{label}</span>
       </div>
 
-      <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
+      <p className="mt-2 text-2xl font-semibold text-content">{value}</p>
 
       {sub != null && <div className="mt-auto pt-3">{sub}</div>}
     </div>

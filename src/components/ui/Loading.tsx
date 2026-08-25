@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 
 const Block = ({ className = '' }: { className?: string }) => (
-  <div className={`rounded-lg bg-white/10 ${className}`} />
+  <div className={`rounded-lg bg-inset ${className}`} />
 )
 
 const Panel = ({ children }: { children: ReactNode }) => (
-  <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+  <div className="rounded-3xl border border-line bg-panel p-6 backdrop-blur-md">
     {children}
   </div>
 )

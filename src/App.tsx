@@ -7,11 +7,14 @@ import CurrentWeather from './components/weather/CurrentWeather'
 import HourlyForecast from './components/weather/HourlyForecast'
 import WeatherConditions from './components/weather/WeatherConditions'
 import WeeklyForecast from './components/weather/WeeklyForecast'
+import ChanceOfRain, { type RainHour } from './components/weather/ChanceOfRain'
 import UnitToggle from './components/ui/UnitToggle'
+import ThemeToggle from './components/ui/ThemeToggle'
 import Loading from './components/ui/Loading'
 import ErrorMessage from './components/ui/ErrorMessage'
 import { useWeather } from './hooks/useWeather'
 import { useUnits } from './hooks/useUnits'
+import { useTheme } from './hooks/useTheme'
 import type { HourData } from './components/weather/HourlyForecastCard'
 import type { ForecastDayData } from './components/weather/ForecastDay'
 import type { GeoLocation } from './types/weather'
@@ -54,6 +57,7 @@ const App = () => {
     fetchWeatherByCoords,
   } = useWeather()
   const { unit, setUnit } = useUnits()
+  const { theme, setTheme } = useTheme()
 
   // On first load, try the device location; fall back to a default city if the
   // user denies, geolocation is unavailable, or it times out. The ref guards
@@ -108,6 +112,15 @@ const App = () => {
     }))
   }, [weather, nowIndex, unit])
 
+  const rainHours = useMemo<RainHour[]>(() => {
+    if (!weather) return []
+    const { time, precipitation_probability } = weather.hourly
+    return time.slice(nowIndex, nowIndex + HOURS_AHEAD).map((t, i) => ({
+      label: i === 0 ? 'Now' : formatHourShort(t),
+      chance: precipitation_probability[nowIndex + i] ?? 0,
+    }))
+  }, [weather, nowIndex])
+
   const days = useMemo<ForecastDayData[]>(() => {
     if (!weather) return []
     const { time, weather_code, temperature_2m_max, temperature_2m_min } = weather.daily
@@ -121,23 +134,23 @@ const App = () => {
     }))
   }, [weather, unit])
 
-  const theme = weather
-    ? weatherTheme(weather.current.weather_code, weather.current.is_day === 1)
+  const pageTheme = weather
+    ? weatherTheme(weather.current.weather_code, weather.current.is_day === 1, theme)
     : undefined
 
   const rainChance = weather?.hourly.precipitation_probability[nowIndex] ?? 0
 
   return (
-    <DashboardLayout background={theme?.background}>
+    <DashboardLayout background={pageTheme?.background}>
       <Sidebar />
 
       <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
         {/* Mobile brand (sidebar is hidden below md) */}
         <div className="mb-4 flex items-center gap-2 md:hidden">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-indigo-500 text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-accent-content">
             <CloudSun size={18} />
           </span>
-          <span className="text-lg font-semibold text-white">Aeris</span>
+          <span className="text-lg font-semibold text-content">Aeris</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -149,6 +162,7 @@ const App = () => {
             />
           </div>
           <UnitToggle unit={unit} onChange={setUnit} />
+          <ThemeToggle theme={theme} onChange={setTheme} />
         </div>
 
         {error && (
@@ -165,12 +179,13 @@ const App = () => {
 
         {weather && location && (
           <div
-            className={`mt-5 grid gap-5 transition-opacity duration-300 lg:grid-cols-[1fr_340px] ${
+            className={`mt-5 space-y-5 transition-opacity duration-300 ${
               loading ? 'opacity-50' : 'opacity-100'
             }`}
           >
-            {/* LEFT */}
-            <div className="space-y-5">
+            {/* Hero current-day card beside the horizontal week strip + rain chart,
+                echoing the design's prominent "today" panel and day row. */}
+            <div className="grid items-start gap-5 lg:grid-cols-[minmax(320px,380px)_1fr]">
               <CurrentWeather
                 city={location.name}
                 region={describeLocation(location)}
@@ -182,26 +197,29 @@ const App = () => {
                 isDay={weather.current.is_day === 1}
                 condition={describeWeatherCode(weather.current.weather_code)}
                 rainChance={rainChance}
-                glow={theme?.glow ?? 'transparent'}
+                glow={pageTheme?.glow ?? 'transparent'}
               />
 
-              <HourlyForecast hours={hours} />
-
-              <WeatherConditions
-                feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
-                wind={displayWind(weather.current.wind_speed_10m, unit)}
-                windDirection={weather.current.wind_direction_10m}
-                humidity={weather.current.relative_humidity_2m}
-                uvIndex={weather.daily.uv_index_max[0]}
-                sunrise={weather.daily.sunrise[0]}
-                sunset={weather.daily.sunset[0]}
-                tempSuffix={TEMP_SUFFIX}
-                windLabel={windUnitLabel(unit)}
-              />
+              <div className="space-y-5">
+                <WeeklyForecast days={days} />
+                <ChanceOfRain hours={rainHours} />
+              </div>
             </div>
 
-            {/* RIGHT */}
-            <WeeklyForecast days={days} />
+            {/* Full-width temperature trend, then the detailed conditions grid. */}
+            <HourlyForecast hours={hours} />
+
+            <WeatherConditions
+              feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
+              wind={displayWind(weather.current.wind_speed_10m, unit)}
+              windDirection={weather.current.wind_direction_10m}
+              humidity={weather.current.relative_humidity_2m}
+              uvIndex={weather.daily.uv_index_max[0]}
+              sunrise={weather.daily.sunrise[0]}
+              sunset={weather.daily.sunset[0]}
+              tempSuffix={TEMP_SUFFIX}
+              windLabel={windUnitLabel(unit)}
+            />
           </div>
         )}
       </main>

@@ -13,8 +13,8 @@ const HourlyForecast = ({ hours }: HourlyForecastProps) => {
   const points: ChartPoint[] = hours.map((h) => ({ label: h.time, temp: h.temp }))
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-md md:p-6">
-      <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
+    <section className="rounded-3xl border border-line bg-panel p-5 backdrop-blur-md md:p-6">
+      <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted">
         Today's forecast
       </h2>
 

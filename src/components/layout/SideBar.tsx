@@ -16,13 +16,13 @@ const SidebarItem = ({ icon, label, active = false }: SidebarItemProps) => {
       aria-current={active ? 'page' : undefined}
       className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition-all ${
         active
-          ? 'bg-linear-to-br from-sky-400 to-sky-600 text-white shadow-lg shadow-sky-500/30'
-          : 'text-slate-400 hover:bg-white/10 hover:text-white'
+          ? 'bg-accent text-accent-content shadow-lg shadow-black/20'
+          : 'text-faint hover:bg-panel-hover hover:text-content'
       }`}
     >
       {/* Active indicator rail */}
       <span
-        className={`absolute -left-3 h-5 w-1 rounded-full bg-sky-400 transition-opacity ${
+        className={`absolute -left-3 h-5 w-1 rounded-full bg-accent transition-opacity ${
           active ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -33,10 +33,10 @@ const SidebarItem = ({ icon, label, active = false }: SidebarItemProps) => {
 
 const SideBar = () => {
   return (
-    <aside className="hidden w-20 shrink-0 flex-col  items-center border-r border-white/5 bg-white/3 rounded-r-4xl  py-6 md:flex">
+    <aside className="hidden w-20 shrink-0 flex-col  items-center border-r border-line bg-surface rounded-r-4xl  py-6 md:flex">
       {/* Brand */}
       <div
-        className="mb-10 flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg shadow-sky-500/30"
+        className="mb-10 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-accent-content shadow-lg shadow-black/20"
         title="Aeris"
         aria-label="Aeris"
       >

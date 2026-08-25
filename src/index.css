@@ -1,12 +1,80 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
+/* Drive dark mode from <html data-theme="dark">, not prefers-color-scheme, so
+   the header toggle is authoritative. The inline script in index.html sets the
+   attribute before this stylesheet paints, avoiding a flash of the wrong theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* `inline` is required for theming: utilities resolve the runtime var directly
+   (e.g. `background-color: var(--panel)`) instead of baking the light value into
+   :root, so the tokens actually swap when data-theme changes. */
+@theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --color-surface: var(--surface); /* translucent frame over the page gradient */
+  --color-panel: var(--panel); /* standard card */
+  --color-panel-hover: var(--panel-hover);
+  --color-inset: var(--inset); /* meter/bar tracks, nested chips */
+  --color-popover: var(--popover); /* solid floating surfaces: dropdowns, tooltips */
+  --color-content: var(--content); /* primary text */
+  --color-muted: var(--muted); /* secondary text */
+  --color-faint: var(--faint); /* tertiary text / icons */
+  --color-line: var(--line); /* borders */
+  --color-accent: var(--accent); /* bright gold — highlight FILLS (hero, active chips) */
+  --color-accent-content: var(--accent-content); /* dark-green text/icons ON gold fills */
+  --color-accent-ink: var(--accent-ink); /* contrast-safe gold for LINES/marks on panels */
+  --color-hero: var(--hero); /* the gold highlighted current card */
+  --color-hero-content: var(--hero-content);
+  --color-hero-muted: var(--hero-muted);
 }
 
-:root {
+/* Forest green (#202B22) base + gold (#ffd85f) accent.
+   Two accent tokens: `accent` is the bright fill (always paired with the dark
+   `accent-content` for text on top), `accent-ink` is a contrast-tuned gold for
+   thin marks (chart line, bars) so they stay legible on a pale panel too. */
+
+/* Light (default). Also applied when data-theme="light" is set explicitly. */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --surface: rgba(255, 253, 245, 0.6);
+  --panel: #fffdf6;
+  --panel-hover: #f1efe1;
+  --inset: #e8e6d6;
+  --popover: #fffdf6;
+  --content: #202b22; /* deep green as primary ink */
+  --muted: #57685b;
+  --faint: #8a978b;
+  --line: rgba(32, 43, 34, 0.1);
+  --accent: #ffd85f;
+  --accent-content: #202b22;
+  --accent-ink: #927400; /* deep gold — passes contrast on cream panels */
+  --hero: #ffd85f;
+  --hero-content: #202b22;
+  --hero-muted: rgba(32, 43, 34, 0.66);
+  --page-bg: linear-gradient(160deg, #f6f4e9 0%, #eef1e4 55%, #f3f1e4 100%);
+}
+
+/* Dark — deep forest surfaces, gold reads brightly on top. */
+[data-theme="dark"] {
   color-scheme: dark;
+  --surface: rgba(255, 249, 231, 0.04);
+  --panel: rgba(255, 249, 231, 0.055);
+  --panel-hover: rgba(255, 249, 231, 0.1);
+  --inset: rgba(255, 249, 231, 0.12);
+  --popover: #2a352b; /* lifted green, solid, for dropdowns & tooltips */
+  --content: #f3f1e4; /* warm cream */
+  --muted: #a6b0a1; /* sage */
+  --faint: #727d6f;
+  --line: rgba(255, 249, 231, 0.1);
+  --accent: #ffd85f;
+  --accent-content: #202b22;
+  --accent-ink: #ffd85f; /* bright gold reads well on the dark green panels */
+  --hero: #ffd85f;
+  --hero-content: #202b22;
+  --hero-muted: rgba(32, 43, 34, 0.66);
+  --page-bg: linear-gradient(160deg, #202b22 0%, #182017 55%, #10160f 100%);
 }
 
 html,
@@ -17,26 +85,28 @@ body,
 
 body {
   margin: 0;
+  background: var(--page-bg);
+  color: var(--content);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Slim, unobtrusive scrollbars that suit the dark UI. */
+/* Slim, unobtrusive scrollbars that follow the active theme. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+  scrollbar-color: color-mix(in oklab, var(--faint) 45%, transparent) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.25);
+  background-color: color-mix(in oklab, var(--faint) 45%, transparent);
   border-radius: 9999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.4);
+  background-color: color-mix(in oklab, var(--faint) 65%, transparent);
 }
 
 /* Gentle entrance used by cards as data arrives. */

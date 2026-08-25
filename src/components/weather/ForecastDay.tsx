@@ -1,5 +1,4 @@
 import WeatherIcon from './WeatherIcon'
-import { tempColor } from '../../utils/tempScale'
 
 export interface ForecastDayData {
   /** ISO date, used as the list key. */
@@ -14,9 +13,6 @@ export interface ForecastDayData {
 }
 
 interface ForecastDayProps extends ForecastDayData {
-  /** Coldest low and warmest high across the whole week, for the shared scale. */
-  weekMin: number
-  weekMax: number
   isToday?: boolean
 }
 
@@ -26,41 +22,37 @@ const ForecastDay = ({
   condition,
   high,
   low,
-  weekMin,
-  weekMax,
   isToday = false,
 }: ForecastDayProps) => {
-  const range = weekMax - weekMin || 1
-  const left = ((low - weekMin) / range) * 100
-  const width = Math.max(((high - low) / range) * 100, 8)
-
   return (
-    <div className="flex items-center gap-3 py-2.5">
+    <div
+      className={`flex min-w-19 flex-1 flex-col items-center gap-3 rounded-2xl px-2 py-4 transition-colors ${
+        isToday
+          ? 'bg-accent text-accent-content shadow-lg shadow-black/15'
+          : 'bg-inset text-content hover:bg-panel-hover'
+      }`}
+    >
       <span
-        className={`w-11 shrink-0 text-sm ${isToday ? 'font-semibold text-white' : 'text-slate-300'}`}
+        className={`text-xs font-semibold ${isToday ? 'text-accent-content' : 'text-muted'}`}
       >
         {isToday ? 'Today' : day}
       </span>
 
-      <WeatherIcon code={code} size="sm" className="shrink-0 text-sky-300" />
+      <WeatherIcon
+        code={code}
+        size="md"
+        className={isToday ? 'text-accent-content' : 'text-accent-ink'}
+      />
       <span className="sr-only">{condition}</span>
 
-      <span className="w-8 shrink-0 text-right text-sm text-slate-400">{low}°</span>
-
-      <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-        <div
-          className="absolute inset-y-0 rounded-full"
-          style={{
-            left: `${left}%`,
-            width: `${width}%`,
-            background: `linear-gradient(90deg, ${tempColor((low - weekMin) / range)}, ${tempColor(
-              (high - weekMin) / range,
-            )})`,
-          }}
-        />
+      <div className="flex flex-col items-center leading-tight">
+        <span className="text-lg font-bold">{high}°</span>
+        <span
+          className={`text-xs ${isToday ? 'text-accent-content/70' : 'text-faint'}`}
+        >
+          {low}°
+        </span>
       </div>
-
-      <span className="w-8 shrink-0 text-sm font-medium text-white">{high}°</span>
     </div>
   )
 }

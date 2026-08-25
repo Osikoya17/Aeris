@@ -16,8 +16,8 @@ interface TemperatureChartProps {
 const HEIGHT = 140
 const PAD_TOP = 30
 const PAD_BOTTOM = 16
-const LINE = '#38bdf8' // sky-400 — single-series accent
-const RING = '#0f1a2c' // surface color for marker rings/crosshair contrast
+// Paint comes from theme tokens (see index.css): the accent for the line/markers
+// and the solid popover color for marker rings, so the chart reads in both themes.
 
 /** Catmull-Rom → cubic-bezier smoothing for a soft, readable trend line. */
 const smoothPath = (pts: { x: number; y: number }[]): string => {
@@ -106,8 +106,8 @@ const TemperatureChart = ({
       >
         <defs>
           <linearGradient id="aeris-temp-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={LINE} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={LINE} stopOpacity="0" />
+            <stop offset="0%" style={{ stopColor: 'var(--accent-ink)' }} stopOpacity="0.28" />
+            <stop offset="100%" style={{ stopColor: 'var(--accent-ink)' }} stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -115,7 +115,7 @@ const TemperatureChart = ({
         <path
           d={line}
           fill="none"
-          stroke={LINE}
+          className="stroke-accent-ink"
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -128,7 +128,7 @@ const TemperatureChart = ({
             y1={PAD_TOP - 6}
             x2={active.x}
             y2={plotBottom}
-            stroke="rgba(148,163,184,0.35)"
+            stroke="rgba(120,130,115,0.4)"
             strokeWidth={1}
           />
         )}
@@ -141,7 +141,7 @@ const TemperatureChart = ({
               x={clampX(c.x)}
               y={c.y - 12}
               textAnchor="middle"
-              className="fill-slate-200 text-[11px] font-medium"
+              className="fill-content text-[11px] font-medium"
             >
               {Math.round(c.temp)}
               {suffix}
@@ -157,8 +157,8 @@ const TemperatureChart = ({
               cx={c.x}
               cy={c.y}
               r={4}
-              fill={LINE}
-              stroke={RING}
+              className="fill-accent-ink"
+              style={{ stroke: 'var(--popover)' }}
               strokeWidth={2}
             />
           ) : null,
@@ -166,21 +166,28 @@ const TemperatureChart = ({
 
         {/* Highlighted marker on hover */}
         {active && (
-          <circle cx={active.x} cy={active.y} r={5} fill={LINE} stroke={RING} strokeWidth={2} />
+          <circle
+            cx={active.x}
+            cy={active.y}
+            r={5}
+            className="fill-accent-ink"
+            style={{ stroke: 'var(--popover)' }}
+            strokeWidth={2}
+          />
         )}
       </svg>
 
       {/* Tooltip */}
       {active && (
         <div
-          className="pointer-events-none absolute -translate-x-1/2 -translate-y-full rounded-lg border border-white/10 bg-[#0b1424]/95 px-2.5 py-1 text-center shadow-lg"
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-full rounded-lg border border-line bg-popover px-2.5 py-1 text-center shadow-lg"
           style={{ left: clampX(active.x), top: active.y - 12 }}
         >
-          <div className="text-sm font-semibold text-white">
+          <div className="text-sm font-semibold text-content">
             {Math.round(active.temp)}
             {suffix}
           </div>
-          <div className="text-[10px] text-slate-400">{active.label}</div>
+          <div className="text-[10px] text-muted">{active.label}</div>
         </div>
       )}
     </div>

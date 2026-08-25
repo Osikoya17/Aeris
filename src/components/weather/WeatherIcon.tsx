@@ -77,7 +77,7 @@ const WeatherIcon = ({
   return createElement(icon, {
     size: SIZE_PX[size],
     strokeWidth: 1.5,
-    className: className ?? 'text-sky-300',
+    className: className ?? 'text-accent-ink',
   })
 }
 

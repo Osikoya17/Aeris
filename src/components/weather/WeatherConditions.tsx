@@ -32,8 +32,8 @@ const WeatherConditions = ({
   const uvPct = Math.min(100, (uvIndex / UV_SCALE_MAX) * 100)
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-md md:p-6">
-      <h2 className="mb-5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+    <section className="rounded-3xl border border-line bg-panel p-5 backdrop-blur-md md:p-6">
+      <h2 className="mb-5 text-xs font-semibold uppercase tracking-wide text-muted">
         Air conditions
       </h2>
 
@@ -49,10 +49,10 @@ const WeatherConditions = ({
           label="Wind"
           value={`${wind} ${windLabel}`}
           sub={
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+            <div className="flex items-center gap-1.5 text-xs text-muted">
               <Navigation
                 size={13}
-                className="text-sky-300"
+                className="text-accent"
                 style={{ transform: `rotate(${windDirection}deg)` }}
                 fill="currentColor"
               />
@@ -66,9 +66,9 @@ const WeatherConditions = ({
           label="Humidity"
           value={`${Math.round(humidity)}%`}
           sub={
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-inset">
               <div
-                className="h-full rounded-full bg-sky-400"
+                className="h-full rounded-full bg-accent"
                 style={{ width: `${Math.min(100, Math.max(0, humidity))}%` }}
               />
             </div>
@@ -81,13 +81,13 @@ const WeatherConditions = ({
           value={`${Math.round(uvIndex)}`}
           sub={
             <div className="space-y-1.5">
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-inset">
                 <div
                   className="h-full rounded-full"
                   style={{ width: `${uvPct}%`, backgroundColor: band.color }}
                 />
               </div>
-              <span className="text-xs text-slate-400">{band.label}</span>
+              <span className="text-xs text-muted">{band.label}</span>
             </div>
           }
         />

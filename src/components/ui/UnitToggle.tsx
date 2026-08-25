@@ -12,7 +12,7 @@ const OPTIONS: { value: UnitSystem; label: string }[] = [
 
 const UnitToggle = ({ unit, onChange }: UnitToggleProps) => {
   return (
-    <div className="inline-flex shrink-0 items-center rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
+    <div className="inline-flex shrink-0 items-center rounded-xl border border-line bg-panel p-1 backdrop-blur-md">
       {OPTIONS.map((option) => {
         const active = unit === option.value
         return (
@@ -23,8 +23,8 @@ const UnitToggle = ({ unit, onChange }: UnitToggleProps) => {
             onClick={() => onChange(option.value)}
             className={`h-8 w-11 rounded-lg text-sm font-medium transition-colors ${
               active
-                ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-accent text-accent-content shadow-sm'
+                : 'text-faint hover:text-content'
             }`}
           >
             {option.label}
