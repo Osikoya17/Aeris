@@ -30,6 +30,7 @@ export const getWeather = async (
         "weather_code",
         "temperature_2m_max",
         "temperature_2m_min",
+        "precipitation_probability_max",
         "uv_index_max",
         "sunrise",
         "sunset",

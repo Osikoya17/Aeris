@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { CloudSun } from 'lucide-react'
 import DashboardLayout from './components/layout/DashBoardLayout'
-import Sidebar from './components/layout/SideBar'
 import SearchBar from './components/weather/SearchBar'
 import CurrentWeather from './components/weather/CurrentWeather'
 import HourlyForecast from './components/weather/HourlyForecast'
@@ -28,8 +27,6 @@ const DEFAULT_CITY = 'Lagos, Nigeria'
 const HOURS_AHEAD = 8
 const TEMP_SUFFIX = '°'
 
-/** Is a given hour between that day's sunrise and sunset? ISO strings share a
- *  zero-padded local format, so lexical comparison equals chronological. */
 const isDaytime = (
   hour: string,
   dailyTime: string[],
@@ -43,7 +40,6 @@ const isDaytime = (
   return hour >= sunrise[idx] && hour < sunset[idx]
 }
 
-/** "Region, Country" without empty separators. */
 const describeLocation = (place: GeoLocation): string =>
   [place.admin1, place.country].filter(Boolean).join(', ')
 
@@ -60,9 +56,6 @@ const App = () => {
   const { unit, setUnit } = useUnits()
   const { theme, setTheme } = useTheme()
 
-  // On first load, try the device location; fall back to a default city if the
-  // user denies, geolocation is unavailable, or it times out. The ref guards
-  // against StrictMode's double-invoke in development.
   const didInit = useRef(false)
   useEffect(() => {
     if (didInit.current) return
@@ -83,25 +76,21 @@ const App = () => {
     if (!('geolocation' in navigator)) return
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
-      () => {
-        /* denied — leave the current view in place */
-      },
+      () => {},
       { timeout: 8000, maximumAge: 600000 },
     )
   }
 
-  // Index of the hourly entry matching the current hour, so "Today's Forecast"
-  // starts from now rather than from midnight.
   const nowIndex = useMemo(() => {
     if (!weather) return 0
-    const stamp = weather.current.time.slice(0, 13) // "YYYY-MM-DDTHH"
+    const stamp = weather.current.time.slice(0, 13)
     const index = weather.hourly.time.findIndex((t) => t.slice(0, 13) === stamp)
     return index >= 0 ? index : 0
   }, [weather])
 
   const hours = useMemo<HourData[]>(() => {
     if (!weather) return []
-    const { time, temperature_2m, weather_code } = weather.hourly
+    const { time, temperature_2m, weather_code, precipitation_probability } = weather.hourly
     const { time: dTime, sunrise, sunset } = weather.daily
     const fallbackDay = weather.current.is_day === 1
     return time.slice(nowIndex, nowIndex + HOURS_AHEAD).map((t, i) => ({
@@ -109,6 +98,7 @@ const App = () => {
       time: i === 0 ? 'Now' : formatHourShort(t),
       code: weather_code[nowIndex + i],
       temp: displayTemp(temperature_2m[nowIndex + i], unit),
+      rain: precipitation_probability[nowIndex + i] ?? 0,
       isDay: isDaytime(t, dTime, sunrise, sunset, fallbackDay),
     }))
   }, [weather, nowIndex, unit])
@@ -124,7 +114,13 @@ const App = () => {
 
   const days = useMemo<ForecastDayData[]>(() => {
     if (!weather) return []
-    const { time, weather_code, temperature_2m_max, temperature_2m_min } = weather.daily
+    const {
+      time,
+      weather_code,
+      temperature_2m_max,
+      temperature_2m_min,
+      precipitation_probability_max,
+    } = weather.daily
     return time.map((t, i) => ({
       date: t,
       day: formatWeekday(t),
@@ -132,6 +128,7 @@ const App = () => {
       condition: describeWeatherCode(weather_code[i]),
       high: displayTemp(temperature_2m_max[i], unit),
       low: displayTemp(temperature_2m_min[i], unit),
+      rain: precipitation_probability_max[i] ?? 0,
     }))
   }, [weather, unit])
 
@@ -143,51 +140,37 @@ const App = () => {
 
   return (
     <DashboardLayout background={pageTheme?.background}>
-      <Sidebar />
-
       <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
-        {/* Mobile brand (sidebar is hidden below md) */}
-        <div className="mb-4 flex items-center gap-2 md:hidden">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-accent-content">
+        <header className="mb-5 flex items-center gap-3 md:mb-6">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-content">
             <CloudSun size={18} />
           </span>
           <span className="text-lg font-semibold text-content">Aeris</span>
-        </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="min-w-0 sm:flex-1">
+          <div className="min-w-0 flex-1">
             <SearchBar
               onSelect={fetchWeatherForLocation}
               onUseLocation={useMyLocation}
               loading={loading}
             />
           </div>
-          <div className="flex items-center justify-end gap-2">
+
+          <div className="flex items-center gap-2">
             <UnitToggle unit={unit} onChange={setUnit} />
             <ThemeToggle theme={theme} onChange={setTheme} />
           </div>
-        </div>
+        </header>
 
-        {error && (
-          <div className="mt-5">
-            <ErrorMessage message={error} />
-          </div>
-        )}
+        {error && <ErrorMessage message={error} />}
 
-        {!weather && !error && (
-          <div className="mt-5">
-            <Loading />
-          </div>
-        )}
+        {!weather && !error && <Loading />}
 
         {weather && location && (
           <div
-            className={`mt-5 transition-opacity duration-300 ${
+            className={`space-y-4 transition-opacity duration-300 md:space-y-5 ${
               loading ? 'opacity-50' : 'opacity-100'
             }`}
           >
-            {/* Mobile-only quick highlights; from md up these live in the hero
-                and the Air conditions grid below. */}
             <HighlightsDeck
               feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
               rainChance={rainChance}
@@ -198,45 +181,40 @@ const App = () => {
               windLabel={windUnitLabel(unit)}
             />
 
-            <div className="space-y-4 md:space-y-5">
-              {/* Hero current-day card beside the horizontal week strip + rain chart,
-                  echoing the design's prominent "today" panel and day row. */}
-              <div className="grid items-start gap-4 md:gap-5 lg:grid-cols-[minmax(320px,380px)_1fr]">
-                <CurrentWeather
-                  city={location.name}
-                  region={describeLocation(location)}
-                  date={formatLongDate(weather.current.time)}
-                  temperature={displayTemp(weather.current.temperature_2m, unit)}
-                  feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
-                  tempSuffix={TEMP_SUFFIX}
-                  code={weather.current.weather_code}
-                  isDay={weather.current.is_day === 1}
-                  condition={describeWeatherCode(weather.current.weather_code)}
-                  rainChance={rainChance}
-                  glow={pageTheme?.glow ?? 'transparent'}
-                />
-
-                <div className="space-y-4 md:space-y-5">
-                  <WeeklyForecast days={days} />
-                  <ChanceOfRain hours={rainHours} />
-                </div>
-              </div>
-
-              {/* Full-width temperature trend, then the detailed conditions grid. */}
-              <HourlyForecast hours={hours} />
-
-              <WeatherConditions
+            <div className="grid items-start gap-4 md:gap-5 lg:grid-cols-[minmax(320px,380px)_1fr]">
+              <CurrentWeather
+                city={location.name}
+                region={describeLocation(location)}
+                date={formatLongDate(weather.current.time)}
+                temperature={displayTemp(weather.current.temperature_2m, unit)}
                 feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
-                wind={displayWind(weather.current.wind_speed_10m, unit)}
-                windDirection={weather.current.wind_direction_10m}
-                humidity={weather.current.relative_humidity_2m}
-                uvIndex={weather.daily.uv_index_max[0]}
-                sunrise={weather.daily.sunrise[0]}
-                sunset={weather.daily.sunset[0]}
                 tempSuffix={TEMP_SUFFIX}
-                windLabel={windUnitLabel(unit)}
+                code={weather.current.weather_code}
+                isDay={weather.current.is_day === 1}
+                condition={describeWeatherCode(weather.current.weather_code)}
+                rainChance={rainChance}
+                glow={pageTheme?.glow ?? 'transparent'}
               />
+
+              <div className="space-y-4 md:space-y-5">
+                <WeeklyForecast days={days} />
+                <ChanceOfRain hours={rainHours} />
+              </div>
             </div>
+
+            <HourlyForecast hours={hours} />
+
+            <WeatherConditions
+              feelsLike={displayTemp(weather.current.apparent_temperature, unit)}
+              wind={displayWind(weather.current.wind_speed_10m, unit)}
+              windDirection={weather.current.wind_direction_10m}
+              humidity={weather.current.relative_humidity_2m}
+              uvIndex={weather.daily.uv_index_max[0]}
+              sunrise={weather.daily.sunrise[0]}
+              sunset={weather.daily.sunset[0]}
+              tempSuffix={TEMP_SUFFIX}
+              windLabel={windUnitLabel(unit)}
+            />
           </div>
         )}
       </main>

@@ -44,6 +44,7 @@ export interface DailyWeather {
   weather_code: number[]
   temperature_2m_max: number[]
   temperature_2m_min: number[]
+  precipitation_probability_max: number[]
   uv_index_max: number[]
   sunrise: string[]
   sunset: string[]

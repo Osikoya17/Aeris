@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Carousel from '../ui/Carousel'
 
 export interface RainHour {
   /** Display label, e.g. "Now" or "3 PM". */
@@ -15,6 +16,9 @@ interface ChanceOfRainProps {
  * Single-series bar chart of hourly rain probability. The full-height track
  * gives each bar its 0–100% context; only the peak (and whatever is hovered)
  * is directly labelled, so the panel stays quiet until you read it.
+ *
+ * Columns keep `flex-1` so they fill the panel on desktop, but a `min-w` floor
+ * makes them overflow into a swipe carousel on a narrow phone.
  */
 const ChanceOfRain = ({ hours }: ChanceOfRainProps) => {
   const [active, setActive] = useState<number | null>(null)
@@ -35,14 +39,14 @@ const ChanceOfRain = ({ hours }: ChanceOfRainProps) => {
         Chance of rain
       </h2>
 
-      <div className="flex h-40 items-end gap-2">
+      <Carousel ariaLabel="Chance of rain by hour" gap="gap-2">
         {hours.map((h, i) => {
           const isActive = i === active
           const showValue = i === peak || isActive
           return (
             <div
               key={`${h.label}-${i}`}
-              className="flex h-full min-w-0 flex-1 flex-col items-center"
+              className="flex h-40 min-w-14 flex-1 snap-start flex-col items-center"
               onMouseEnter={() => setActive(i)}
               onMouseLeave={() => setActive(null)}
               aria-label={`${h.label}: ${Math.round(h.chance)}% chance of rain`}
@@ -70,7 +74,7 @@ const ChanceOfRain = ({ hours }: ChanceOfRainProps) => {
             </div>
           )
         })}
-      </div>
+      </Carousel>
     </section>
   )
 }
